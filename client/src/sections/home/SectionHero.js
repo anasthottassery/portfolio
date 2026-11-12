@@ -1,16 +1,17 @@
 "use client";
 
-import React, { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import React, { useState } from "react";
+import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 
 import { Container, Box, Typography } from "@mui/material";
 import Image from "next/image";
-import SelfPortrait from "../../../public/self_portrait.png";
+import SelfPortrait from "../../../public/self_portrait.webp";
 import useBreakpoint from "@useBreakpoints";
 import AnimatedLink from "@/components/AnimatedLink";
 
-function SectionHero() {
-  const ref = useRef(null);
+function SectionHero({ ready = true, onPortraitReady }) {
+  const [portraitFailed, setPortraitFailed] = useState(false);
+  const reducedMotion = useReducedMotion();
   const { scrollY } = useScroll();
 
   const bp = useBreakpoint();
@@ -40,10 +41,10 @@ function SectionHero() {
       }}
     >
       <motion.div
-        initial={{ y: 200, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
+        initial={reducedMotion ? false : { y: 200, opacity: 0 }}
+        animate={ready ? { y: 0, opacity: 1 } : undefined}
         transition={{
-          duration: 1.2,
+          duration: reducedMotion ? 0 : 1.2,
           ease: [0.17, 0.55, 0.55, 1],
           delay: 0,
         }}
@@ -54,7 +55,7 @@ function SectionHero() {
           textAlign: "left",
         }}
       >
-        <motion.div style={{ x }}>
+        <motion.div style={{ x: reducedMotion ? 0 : x }}>
           <Typography
             sx={{
               marginTop: { xs: "0", md: "unset" },
@@ -94,6 +95,8 @@ function SectionHero() {
             sx={{
               gridRow: "1 / 4",
               gridColumn: { xs: "1 / 3", sm: "1 / 4", md: "2 / 6" },
+              // Limit only the tablet portrait; mobile and desktop retain their layout.
+              "@media (min-width:600px) and (max-width:899.95px)": { width: "min(72vw, 480px)", justifySelf: "center" },
               // gridColumnEnd: {
               //   sm: "3",
               //   md: "4",
@@ -109,12 +112,12 @@ function SectionHero() {
               }}
             >
               <motion.div
-                initial={{ y: 200, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
+                initial={reducedMotion ? false : { y: 200, opacity: 0 }}
+                animate={ready ? { y: 0, opacity: 1 } : undefined}
                 transition={{
-                  duration: 1.2,
+                  duration: reducedMotion ? 0 : 1.2,
                   ease: [0.17, 0.55, 0.55, 1],
-                  delay: 0.5,
+                  delay: reducedMotion ? 0 : 0.5,
                 }}
                 style={{
                   width: "200vw",
@@ -125,7 +128,7 @@ function SectionHero() {
                   right: "auto",
                 }}
               >
-                <motion.div style={{ x: invertedX }}>
+                <motion.div style={{ x: reducedMotion ? 0 : invertedX }}>
                   <Typography
                     sx={{
                       fontSize: {
@@ -149,32 +152,37 @@ function SectionHero() {
             {/* White Text */}
             <Box sx={{ position: "relative", zIndex: 2, overflow: "hidden" }}>
               <motion.div
-                initial={{ x: 200, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
+                initial={reducedMotion ? false : { x: 200, opacity: 0 }}
+                animate={ready ? { x: 0, opacity: 1 } : undefined}
                 transition={{
-                  duration: 1.2,
+                  duration: reducedMotion ? 0 : 1.2,
                   ease: [0.17, 0.55, 0.55, 1],
-                  delay: 0.5,
+                  delay: reducedMotion ? 0 : 0.5,
                 }}
               >
                 <Image
                   src={SelfPortrait}
                   alt="Hero Portrait"
+                  onLoad={() => onPortraitReady?.(true)}
+                  onError={() => { setPortraitFailed(true); onPortraitReady?.(true); }}
+                  fetchPriority="high"
                   style={{
                     width: "100%",
                     maxWidth: "100%",
                     display: "inline-block",
+                    visibility: portraitFailed ? "hidden" : "visible",
                   }}
                   priority
                 />
+                {portraitFailed && <Typography role="status" sx={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", color: "#666", fontSize: 13 }}>Portrait unavailable</Typography>}
               </motion.div>
               <motion.div
-                initial={{ y: 200, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
+                initial={reducedMotion ? false : { y: 200, opacity: 0 }}
+                animate={ready ? { y: 0, opacity: 1 } : undefined}
                 transition={{
-                  duration: 1.2,
+                  duration: reducedMotion ? 0 : 1.2,
                   ease: [0.17, 0.55, 0.55, 1],
-                  delay: 0.5,
+                  delay: reducedMotion ? 0 : 0.5,
                 }}
                 style={{
                   width: "200vw",
@@ -185,7 +193,7 @@ function SectionHero() {
                   right: "auto",
                 }}
               >
-                <motion.div style={{ x: invertedX }}>
+                <motion.div style={{ x: reducedMotion ? 0 : invertedX }}>
                   <Typography
                     sx={{
                       fontSize: {
@@ -225,12 +233,12 @@ function SectionHero() {
             }}
           >
             <motion.div
-              initial={{ y: 200, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
+              initial={reducedMotion ? false : { y: 200, opacity: 0 }}
+              animate={ready ? { y: 0, opacity: 1 } : undefined}
               transition={{
-                duration: 1.2,
+                duration: reducedMotion ? 0 : 1.2,
                 ease: [0.17, 0.55, 0.55, 1],
-                delay: 0.5,
+                delay: reducedMotion ? 0 : 0.5,
               }}
             >
               <Typography
@@ -242,9 +250,9 @@ function SectionHero() {
                   lineHeight: 1.3,
                 }}
               >
-                I&apos;m a CS student turning ideas into reality. I&apos;m
-                developing my skills and building projects you can explore on my
-                website. Let&apos;s see what we can create together! 👋
+                It often starts with a random idea, a little curiosity,
+                and a lot of figuring things out. Somewhere along the way,
+                it turns into something worth sharing. Take a look around! 👋
               </Typography>
             </motion.div>
           </Box>

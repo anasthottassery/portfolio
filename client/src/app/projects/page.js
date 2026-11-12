@@ -1,281 +1,40 @@
 "use client";
-
-import React from "react";
-import { motion } from "framer-motion";
-import { Container, Box, Typography, Chip } from "@mui/material";
+import { useState } from "react";
+import { Box, Container, Typography, Chip, Button, Link, Collapse } from "@mui/material";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import AddIcon from "@mui/icons-material/Add";
 import ArrowOutwardIcon from "@mui/icons-material/ArrowOutward";
-
-const projects = [
-  {
-    id: "01",
-    title: "Relay",
-    subtitle: "Cross-Platform Low-Latency Communication Framework",
-    status: "Ongoing",
-    description:
-      "An ambitious systems project focused on building a cross-platform communication framework for seamless device-to-device connectivity. The architecture combines BLE-assisted discovery, Wi-Fi-based communication, and platform-specific transport layers to provide fast and reliable connectivity across Apple and non-Apple ecosystems while maintaining low latency and high reliability.",
-    details:
-      "Investigates practical approaches to cross-platform interoperability, modular networking architecture, and efficient communication protocols that can support future applications such as file transfer, device communication, and real-time media streaming.",
-    tags: [
-      "C/C++",
-      "Swift",
-      "Kotlin",
-      "BLE",
-      "Wi-Fi",
-      "Multipeer Connectivity",
-      "Distributed Systems",
-    ],
-    link: null,
-  },
-  {
-    id: "02",
-    title: "Muvv",
-    subtitle: "AR Indoor Navigation System",
-    status: null,
-    description:
-      "An Android-based indoor navigation prototype exploring markerless indoor localization using augmented reality technologies. Leverages ARCore for persistent room mapping while providing an intuitive navigation experience within indoor environments.",
-    details:
-      "Incorporates multi-anchor localization, JSON-based navigation graphs, Room Database integration, and a Jetpack Compose interface. Research includes combining visual localization with inertial sensor data to improve navigation accuracy and reliability.",
-    tags: [
-      "Kotlin",
-      "Jetpack Compose",
-      "ARCore",
-      "OpenGL ES",
-      "Room Database",
-      "SQLite",
-    ],
-    link: null,
-  },
-  {
-    id: "03",
-    title: "Royal Gold Algo",
-    subtitle: "Financial Trading Platform Website",
-    status: null,
-    description:
-      "A production-ready marketing website developed for a financial trading platform. Focused on delivering a responsive, modern, and high-performance user experience while integrating real-time financial market data.",
-    details:
-      "Features responsive layouts, modern UI components, TradingView chart integration, and performance-focused frontend architecture. Developed as a freelance project, providing valuable experience in client communication and production deployment.",
-    tags: [
-      "React",
-      "JavaScript",
-      "Material UI",
-      "Tailwind CSS",
-      "TradingView API",
-    ],
-    link: "https://royalgoldalgo.com/",
-  },
-  {
-    id: "04",
-    title: "Fake News Detection",
-    subtitle: "AI-Powered News Classification System",
-    status: null,
-    description:
-      "A machine learning application designed to classify news articles using Natural Language Processing techniques. Includes a complete pipeline covering data preprocessing, text cleaning, feature extraction using TF-IDF, model training, evaluation, and REST API integration.",
-    details:
-      "Initially developed with Flask, the backend was later migrated to a MERN stack to improve scalability and provide a more modern application structure. Provided practical experience in ML workflows, backend development, and deploying AI models within real-world web applications.",
-    tags: [
-      "Python",
-      "Scikit-learn",
-      "TensorFlow",
-      "React",
-      "Node.js",
-      "MongoDB",
-      "NLP",
-      "TF-IDF",
-    ],
-    link: null,
-  },
-];
-
-const ease = [0.17, 0.55, 0.55, 1];
-
+import Reveal from "@/components/Reveal";
+import ProjectArt from "@/components/ProjectArt";
+import { projects } from "@/data/projects";
+const categories = ["All work", "Systems", "Mobile", "Web", "AI / ML"];
+function ProjectDetails({ project }) {
+  const [open, setOpen] = useState(false);
+  const reduced = useReducedMotion();
+  return <Box sx={{ mt: 2.5, borderTop: "1px solid #e5e5e5" }}>
+    <Button onClick={() => setOpen(value => !value)} aria-expanded={open} aria-controls={`details-${project.id}`} sx={{ width: "100%", justifyContent: "space-between", borderRadius: 0, p: "14px 0", fontSize: 13, color: "#111", "&:hover": { bgcolor: "transparent" } }}>
+      Engineering details <AddIcon sx={{ fontSize: 18, transform: open ? "rotate(45deg)" : "none", transition: reduced ? "none" : "transform .25s ease" }} />
+    </Button>
+    <Collapse in={open} timeout={reduced ? 0 : 250}><Typography id={`details-${project.id}`} sx={{ color: "#555", lineHeight: 1.8, fontSize: 14, pb: 2 }}>{project.details}</Typography></Collapse>
+  </Box>;
+}
 export default function ProjectsPage() {
-  return (
-    <Box sx={{ minHeight: "100vh", pt: { xs: "2rem", md: "2rem" }, pb: "4rem" }}>
-      <Container
-        maxWidth={false}
-        sx={{ maxWidth: "1170px", mx: "auto", px: "20px" }}
-      >
-        {/* Header */}
-        <motion.div
-          initial={{ y: 100, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 1, ease }}
-        >
-          <Typography
-            sx={{
-              fontSize: { xs: "60px", sm: "80px", md: "140px" },
-              fontWeight: 500,
-              lineHeight: 1,
-              mb: "0.5rem",
-            }}
-          >
-            Projects
-          </Typography>
-          <Typography
-            sx={{
-              fontSize: { xs: "18px", md: "22px" },
-              fontWeight: 400,
-              color: "#666",
-              mb: { xs: "2rem", md: "3rem" },
-              maxWidth: "600px",
-            }}
-          >
-            Things I&apos;ve built, researched, and shipped.
-          </Typography>
-        </motion.div>
-
-        {/* Project List */}
-        <Box>
-          {projects.map((project, index) => (
-            <motion.div
-              key={project.id}
-              initial={{ y: 60, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{
-                duration: 0.8,
-                ease,
-                delay: 0.2 + index * 0.12,
-              }}
-            >
-              <Box
-                component={project.link ? "a" : "div"}
-                href={project.link || undefined}
-                target={project.link ? "_blank" : undefined}
-                rel={project.link ? "noopener noreferrer" : undefined}
-                sx={{
-                  display: "block",
-                  textDecoration: "none",
-                  color: "inherit",
-                  py: { xs: "2rem", md: "3rem" },
-                  borderTop: index === 0 ? "1px solid #e0e0e0" : "none",
-                  borderBottom: "1px solid #e0e0e0",
-                  transition: "all 0.3s ease",
-                  cursor: project.link ? "pointer" : "default",
-                  "&:hover": project.link
-                    ? {
-                        backgroundColor: "#fafafa",
-                        px: { xs: "12px", md: "20px" },
-                        mx: { xs: "-12px", md: "-20px" },
-                      }
-                    : {},
-                }}
-              >
-                {/* Top Row: Number + Status */}
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    mb: "1rem",
-                  }}
-                >
-                  <Typography
-                    sx={{
-                      fontSize: "14px",
-                      fontWeight: 500,
-                      color: "#bbb",
-                      fontFamily: "monospace",
-                    }}
-                  >
-                    {project.id}
-                  </Typography>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                    {project.status && (
-                      <Chip
-                        label={project.status}
-                        size="small"
-                        sx={{
-                          backgroundColor: "#000",
-                          color: "#fff",
-                          fontFamily: "Manrope, sans-serif",
-                          fontWeight: 600,
-                          fontSize: "11px",
-                          letterSpacing: "0.5px",
-                          height: "24px",
-                          borderRadius: "6px",
-                        }}
-                      />
-                    )}
-                    {project.link && (
-                      <ArrowOutwardIcon
-                        sx={{ fontSize: "18px", color: "#999" }}
-                      />
-                    )}
-                  </Box>
-                </Box>
-
-                {/* Title + Subtitle */}
-                <Typography
-                  sx={{
-                    fontSize: { xs: "28px", sm: "32px", md: "40px" },
-                    fontWeight: 600,
-                    lineHeight: 1.15,
-                    mb: "6px",
-                  }}
-                >
-                  {project.title}
-                </Typography>
-                <Typography
-                  sx={{
-                    fontSize: { xs: "16px", md: "18px" },
-                    fontWeight: 400,
-                    color: "#888",
-                    mb: { xs: "1rem", md: "1.25rem" },
-                  }}
-                >
-                  {project.subtitle}
-                </Typography>
-
-                {/* Description */}
-                <Typography
-                  sx={{
-                    fontSize: { xs: "15px", md: "16px" },
-                    color: "#555",
-                    lineHeight: 1.7,
-                    maxWidth: "800px",
-                    mb: "6px",
-                  }}
-                >
-                  {project.description}
-                </Typography>
-                <Typography
-                  sx={{
-                    fontSize: { xs: "15px", md: "16px" },
-                    color: "#777",
-                    lineHeight: 1.7,
-                    maxWidth: "800px",
-                    mb: "1.25rem",
-                  }}
-                >
-                  {project.details}
-                </Typography>
-
-                {/* Tags */}
-                <Box
-                  sx={{ display: "flex", flexWrap: "wrap", gap: "8px" }}
-                >
-                  {project.tags.map((tag) => (
-                    <Chip
-                      key={tag}
-                      label={tag}
-                      size="small"
-                      sx={{
-                        backgroundColor: "#f5f5f5",
-                        color: "#444",
-                        fontFamily: "Manrope, sans-serif",
-                        fontWeight: 500,
-                        fontSize: "12px",
-                        borderRadius: "8px",
-                        height: "28px",
-                      }}
-                    />
-                  ))}
-                </Box>
-              </Box>
-            </motion.div>
-          ))}
-        </Box>
-      </Container>
-    </Box>
-  );
+  const reduced = useReducedMotion();
+  const [category, setCategory] = useState("All work");
+  return <Container maxWidth={false} sx={{ maxWidth: 1170, px: "20px", pt: { xs: 4, md: 6 }, pb: 10 }}>
+    <Reveal><Typography sx={{ fontSize: 12, letterSpacing: 2, color: "#666", mb: 2 }}>SELECTED WORK / 01—04</Typography><Typography component="h1" sx={{ fontSize: { xs: 50, md: 80 }, letterSpacing: "-.04em", lineHeight: 1.05 }}>Ideas into<br />working software.</Typography><Typography sx={{ mt: 3, maxWidth: 520, fontSize: 17, color: "#666", lineHeight: 1.8 }}>An exploration of systems, mobile experiences, and the web. Each project brings a different engineering challenge.</Typography></Reveal>
+    <Box role="group" aria-label="Filter projects" sx={{ display: "flex", flexWrap: "wrap", gap: 1, mt: 4, mb: 3 }}>{categories.map(item => <Button key={item} aria-pressed={category === item} onClick={() => setCategory(item)} sx={{ border: "1px solid", borderColor: category === item ? "#111" : "#ddd", bgcolor: category === item ? "#111" : "#fff", color: category === item ? "#fff" : "#555", px: 2.5, py: 1, fontSize: 13, "&:hover": { bgcolor: category === item ? "#333" : "#f5f5f5" } }}>{item}</Button>)}</Box>
+    <Typography role="status" sx={{ fontSize: 12, color: "#666", mb: 2 }}>{category === "All work" ? "4 projects" : `1 project · ${category}`}</Typography>
+    <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" }, gap: { xs: 4, md: 5 } }}><AnimatePresence mode="popLayout" initial={false}>{projects.map((project,i) => (category === "All work" || category === categories[i+1]) && <motion.div layout={reduced ? false : "position"} key={project.id} initial={{ opacity: 0, y: reduced ? 0 : 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: reduced ? 1 : .98 }} transition={{ duration: reduced ? 0 : .28 }} style={{ minWidth: 0 }}>
+      <Box component="article" className="project-card" sx={{ borderBottom: "1px solid #ddd", pb: 4, height: "100%" }}>
+        <ProjectArt title={project.title} />
+        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mt: 2.5, mb: 1.5 }}><Typography sx={{ fontSize: 11, color: "#666", letterSpacing: 1.5 }}>{project.id} / {categories[i+1].toUpperCase()}</Typography>{project.status && <Chip label={project.status} size="small" sx={{ bgcolor: "#111", color: "#fff", height: 22, fontSize: 11 }} />}</Box>
+        <Typography component="h2" sx={{ fontSize: { xs: 28, md: 34 }, letterSpacing: "-.03em" }}>{project.title}</Typography><Typography sx={{ color: "#666", fontSize: 14, mt: .5, mb: 2 }}>{project.subtitle}</Typography>
+        <Typography sx={{ fontSize: 14, color: "#555", lineHeight: 1.8 }}>{project.description}</Typography>
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: .75, mt: 2 }}>{project.tags.map(tag => <Chip key={tag} label={tag} size="small" sx={{ fontSize: 11, bgcolor: "#f3f3f3", borderRadius: 1, height: 25 }} />)}</Box>
+        <ProjectDetails project={project} />
+        {project.link && <Link href={project.link} target="_blank" rel="noopener noreferrer" underline="none" sx={{ display: "inline-flex", gap: 1, alignItems: "center", color: "#111", mt: 2, fontSize: 14, "&:hover": { gap: 1.5 } }}>Visit website <ArrowOutwardIcon sx={{ fontSize: 17 }} /></Link>}
+      </Box>
+    </motion.div>)}</AnimatePresence></Box>
+  </Container>;
 }

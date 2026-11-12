@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { motion, useScroll, useVelocity, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
   Box,
   Typography,
@@ -13,14 +13,14 @@ import CloseIcon from "@mui/icons-material/Close";
 import MenuIcon from "./icons/MenuIcon";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
 import logo from "../../public/logo.svg";
+import { usePathname } from "next/navigation";
 import useBreakpoint from "../hooks/useBreakpoints";
 
 const navItems = [
   { label: "Projects", href: "/projects" },
   { label: "Resume", href: "/resume" },
-  { label: "Contact", href: "/#contact" },
+  { label: "Contact", href: "/contact" },
 ];
 
 const SlideUp = React.forwardRef(function SlideUp(props, ref) {
@@ -30,80 +30,17 @@ const SlideUp = React.forwardRef(function SlideUp(props, ref) {
 function Navbar() {
   const { isMdDown } = useBreakpoint();
   const slideDistance = isMdDown ? 64 : 80;
-  const threshold = 200;
-
-  const { scrollY } = useScroll();
-  const scrollVelocity = useVelocity(scrollY);
-  const router = useRouter();
   const pathname = usePathname();
-
+  const reducedMotion = useReducedMotion();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isScrollingBack, setIsScrollingBack] = useState(false);
-  const [isAtTop, setIsAtTop] = useState(true);
-  const [isInView, setIsInView] = useState(true);
-
-  useEffect(() => {
-    const unsubscribe = scrollVelocity.on("change", (latest) => {
-      if (latest > 0) {
-        setIsScrollingBack(false);
-        return;
-      }
-      if (latest < -threshold) {
-        setIsScrollingBack(true);
-        return;
-      }
-    });
-    return () => unsubscribe();
-  }, [scrollVelocity]);
-
-  useEffect(() => {
-    const unsubscribe = scrollY.on("change", (latest) => setIsAtTop(latest <= 0));
-    return () => unsubscribe();
-  }, [scrollY]);
-
-  useEffect(() => {
-    setIsInView(isScrollingBack || isAtTop);
-  }, [isScrollingBack, isAtTop]);
-
-  const handleContactClick = (e) => {
-    e.preventDefault();
-    setMenuOpen(false);
-
-    const contactEl = document.getElementById("contact");
-
-    if (contactEl) {
-      contactEl.scrollIntoView({ behavior: "smooth" });
-    } else {
-      sessionStorage.setItem("scrollToContact", "true");
-      router.push("/");
-
-      let attempts = 0;
-      const waitForContact = () => {
-        attempts++;
-        const el = document.getElementById("contact");
-        if (el) {
-          setTimeout(() => el.scrollIntoView({ behavior: "smooth" }), 300);
-        } else if (attempts < 200) {
-          requestAnimationFrame(waitForContact);
-        }
-      };
-      requestAnimationFrame(waitForContact);
-    }
-  };
-
-  const handleNavClick = (e, item) => {
-    if (item.label === "Contact") {
-      handleContactClick(e);
-    } else {
-      setMenuOpen(false);
-    }
-  };
+  useEffect(() => { setMenuOpen(false); }, [pathname]);
+  useEffect(() => { if (!isMdDown) setMenuOpen(false); }, [isMdDown]);
 
   return (
-    <Box sx={{ mt: 0, py: { xs: 0, md: "10px" }, width: "100%", position: 'relative', zIndex: 10 }}>
+    <Box component="header" sx={{ mt: 0, py: { xs: 0, md: "10px" }, width: "100%", position: 'relative', zIndex: 10 }}>
     <motion.div
-      animate={{ y: isInView ? 0 : -slideDistance }}
-      transition={{ duration: 0.5, ease: "easeInOut" }}
+      animate={{ y: 0 }}
+      transition={{ duration: reducedMotion ? 0 : 0.5, ease: "easeInOut" }}
       style={{
         zIndex: 1000,
         display: "flex",
@@ -111,7 +48,7 @@ function Navbar() {
         left: 0,
         height: slideDistance,
         width: "100%",
-        padding: "0 0 !important",
+        padding: 0,
         alignItems: "stretch",
         backgroundColor: "#ffffff",
       }}
@@ -170,8 +107,8 @@ function Navbar() {
             <Link
               key={item.label}
               href={item.href}
-              onClick={item.label === "Contact" ? handleContactClick : undefined}
-              style={{ textDecoration: 'none' }}
+              aria-current={pathname === item.href ? "page" : undefined}
+              style={{ textDecoration: 'none', borderBottom: pathname === item.href ? "1px solid #111" : "1px solid transparent" }}
             >
               <Typography
                 sx={{
@@ -200,7 +137,7 @@ function Navbar() {
 
         {/* Hamburger menu for small screens */}
         <Box sx={{ display: { xs: "flex", md: "none" }, alignItems: "center" }}>
-          <IconButton onClick={() => setMenuOpen(true)} size="large">
+          <IconButton aria-label="Open navigation" aria-expanded={menuOpen} onClick={() => setMenuOpen(true)} size="large">
             <MenuIcon color="#000000" size={36} />
           </IconButton>
         </Box>
@@ -210,10 +147,12 @@ function Navbar() {
     {/* Fullscreen mobile menu dialog */}
     <Dialog
       fullScreen
+      aria-label="Navigation"
       open={menuOpen}
       onClose={() => setMenuOpen(false)}
       TransitionComponent={SlideUp}
-      transitionDuration={400}
+      transitionDuration={reducedMotion ? 0 : 400}
+      slotProps={{ paper: { "data-lenis-prevent": true } }}
       sx={{
         display: { md: "none" },
         "& .MuiDialog-paper": {
@@ -265,6 +204,7 @@ function Navbar() {
             </Box>
           </Link>
           <IconButton
+            aria-label="Close navigation"
             onClick={() => setMenuOpen(false)}
             sx={{ color: "#fff" }}
           >
@@ -287,18 +227,19 @@ function Navbar() {
               navItems.map((item, index) => (
                 <motion.div
                   key={item.label}
-                  initial={{ y: 40, opacity: 0 }}
+                  initial={reducedMotion ? false : { y: 40, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   exit={{ y: -20, opacity: 0 }}
                   transition={{
-                    duration: 0.5,
+                    duration: reducedMotion ? 0 : 0.5,
                     ease: [0.17, 0.55, 0.55, 1],
-                    delay: 0.15 + index * 0.08,
+                    delay: reducedMotion ? 0 : 0.15 + index * 0.08,
                   }}
                 >
                   <Link
                     href={item.href}
-                    onClick={(e) => handleNavClick(e, item)}
+              aria-current={pathname === item.href ? "page" : undefined}
+                    onClick={() => setMenuOpen(false)}
                     style={{ textDecoration: "none" }}
                   >
                     <Typography
@@ -325,7 +266,7 @@ function Navbar() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: menuOpen ? 1 : 0 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
+          transition={{ duration: reducedMotion ? 0 : 0.5, delay: 0.5 }}
         >
           <Box
             sx={{
@@ -336,7 +277,7 @@ function Navbar() {
           >
             <Typography
               component="a"
-              href="mailto:anastnazz@gmail.com"
+              href="mailto:thottassery.anas@gmail.com"
               sx={{
                 fontSize: "16px",
                 fontFamily: "Manrope, sans-serif",
@@ -347,7 +288,7 @@ function Navbar() {
                 "&:hover": { color: "#fff" },
               }}
             >
-              anastnazz@gmail.com
+              thottassery.anas@gmail.com
             </Typography>
           </Box>
         </motion.div>

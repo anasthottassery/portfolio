@@ -92,7 +92,7 @@ function SectionContact() {
             >
               Email
             </Typography>
-            <AnimatedLink href="mailto:anastnazz@gmail.com">
+            <AnimatedLink href="mailto:thottassery.anas@gmail.com">
               thottassery.anas@gmail.com
             </AnimatedLink>
           </Box>
