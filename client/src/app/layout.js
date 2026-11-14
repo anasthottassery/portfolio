@@ -11,7 +11,7 @@ export const metadata = {
   title: "Mohammed Anas Thottassery | Software Developer",
 
   description:
-    "Explore the portfolio of Mohammed Anas Thottassery, a software developer building full-stack web applications with React, Next.js, Node.js, and MongoDB.",
+    "The portfolio of Mohammed Anas Thottassery — a software developer building web and native applications, exploring software systems, and solving practical engineering problems.",
 
   alternates: {
     canonical: "/",
@@ -20,7 +20,7 @@ export const metadata = {
   openGraph: {
     title: "Mohammed Anas Thottassery | Software Developer",
     description:
-      "Explore my projects, technical skills, and experience in full-stack web development.",
+      "Explore my projects, technical work, and journey in software development — from building applications to exploring the engineering behind them.",
     url: "https://anasthottassery.dev",
     siteName: "Mohammed Anas Thottassery",
     type: "website",
