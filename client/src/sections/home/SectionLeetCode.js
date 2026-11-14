@@ -1,11 +1,13 @@
 "use client";
 import { useEffect, useMemo, useState, useRef } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { Box, Container, Typography, Link, Tooltip, Button } from "@mui/material";
+import { Box, Container, Typography, Link, Tooltip, Button, Skeleton } from "@mui/material";
 import ArrowOutwardIcon from "@mui/icons-material/ArrowOutward";
+
 const DAY = 86400000;
-const colors = ["#eeeeee", "#bdbdbd", "#888888", "#444444", "#111111"];
+const colors = ["#ebebeb", "#b5b5b5", "#7e7e7e", "#444444", "#111111"];
 const formatDate = date => date.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
+
 export default function SectionLeetCode() {
   const reducedMotion = useReducedMotion();
   const calendarRef = useRef(null);
@@ -13,6 +15,7 @@ export default function SectionLeetCode() {
   const [data, setData] = useState(null);
   const [error, setError] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+
   useEffect(() => {
     const controller = new AbortController();
     let inFlight = false;
@@ -48,12 +51,14 @@ export default function SectionLeetCode() {
     document.addEventListener("visibilitychange", onVisible);
     return () => { controller.abort(); clearTimeout(timeout); clearInterval(interval); document.removeEventListener("visibilitychange", onVisible); };
   }, [refreshKey]);
+
   useEffect(() => {
     if (data && calendarRef.current && !positioned.current) {
       calendarRef.current.scrollLeft = calendarRef.current.scrollWidth;
       positioned.current = true;
     }
   }, [data]);
+
   const days = useMemo(() => {
     if (!data) return [];
     const end = new Date(data.updatedAt); end.setUTCHours(0, 0, 0, 0);
@@ -65,8 +70,10 @@ export default function SectionLeetCode() {
     }
     return cells;
   }, [data]);
+
   const total = days.reduce((sum, day) => sum + (day?.count || 0), 0);
   const active = days.filter(day => day?.count > 0).length;
+
   return (
     <Box
       id="leetcode"
@@ -75,6 +82,7 @@ export default function SectionLeetCode() {
       sx={{ py: { xs: "4rem", md: "6rem" }, borderTop: "1px solid #e0e0e0" }}
     >
       <Container maxWidth={false} sx={{ maxWidth: "1170px", mx: "auto", px: "20px" }}>
+        {/* Header Block: Kicker, Headline, and CTA Link */}
         <motion.div
           initial={reducedMotion ? false : { y: 60, opacity: 0 }}
           whileInView={{ y: 0, opacity: 1 }}
@@ -84,23 +92,70 @@ export default function SectionLeetCode() {
             ease: [0.17, 0.55, 0.55, 1],
           }}
         >
-          <Typography sx={{ fontSize: 13, letterSpacing: "2px", color: "#666", mb: 2 }}>
-            PROBLEM SOLVING
-          </Typography>
-          <Typography
-            id="leetcode-heading"
-            component="h2"
+          <Box
             sx={{
-              fontSize: { xs: 40, md: 64 },
-              fontWeight: 500,
-              lineHeight: 1.1,
-              mb: 2,
+              display: "flex",
+              flexDirection: { xs: "column", sm: "row" },
+              justifyContent: "space-between",
+              alignItems: { xs: "flex-start", sm: "flex-end" },
+              gap: 2,
+              mb: { xs: 4, md: 5 },
             }}
           >
-            A little better, every day.
-          </Typography>
+            <Box>
+              <Typography
+                sx={{
+                  fontSize: 12,
+                  letterSpacing: 2,
+                  color: "#666",
+                  textTransform: "uppercase",
+                  mb: 1.5,
+                }}
+              >
+                PROBLEM SOLVING / LEETCODE
+              </Typography>
+              <Typography
+                id="leetcode-heading"
+                component="h2"
+                sx={{
+                  fontSize: { xs: 36, sm: 48, md: 64 },
+                  fontWeight: 500,
+                  lineHeight: 1.1,
+                  letterSpacing: "-0.03em",
+                }}
+              >
+                A little better, every day.
+              </Typography>
+            </Box>
+
+            <Link
+              href="https://leetcode.com/u/mohdanast/"
+              target="_blank"
+              rel="noopener noreferrer"
+              underline="none"
+              sx={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                color: "#111",
+                fontSize: { xs: 15, md: 16 },
+                fontWeight: 500,
+                pb: 0.5,
+                borderBottom: "1px solid #ccc",
+                transition: "gap 0.2s ease, border-color 0.2s ease",
+                "&:hover, &:focus-visible": {
+                  gap: "12px",
+                  borderColor: "#000",
+                },
+              }}
+            >
+              <span>View profile</span>
+              <ArrowOutwardIcon sx={{ fontSize: "16px" }} />
+            </Link>
+          </Box>
         </motion.div>
 
+        {/* Stats Row */}
         <motion.div
           initial={reducedMotion ? false : { y: 40, opacity: 0 }}
           whileInView={{ y: 0, opacity: 1 }}
@@ -108,88 +163,101 @@ export default function SectionLeetCode() {
           transition={{
             duration: reducedMotion ? 0 : 0.8,
             ease: [0.17, 0.55, 0.55, 1],
-            delay: 0.2,
+            delay: 0.15,
           }}
         >
-          <Link
-            href="https://leetcode.com/u/mohdanast/"
-            target="_blank"
-            rel="noopener noreferrer"
-            underline="none"
+          <Box
             sx={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "8px",
-              color: "#000",
-              transition: "gap 0.3s ease",
-              "&:hover, &:focus-visible": { gap: "12px" },
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "baseline",
+              gap: { xs: 4, sm: 6, md: 8 },
+              pt: { xs: 1, md: 2 },
+              pb: { xs: 3, md: 4 },
+              borderBottom: "1px solid #ebebeb",
             }}
           >
-            <Typography component="span" sx={{ fontSize: { xs: "16px", md: "18px" }, fontWeight: 500 }}>
-              View on LeetCode
-            </Typography>
-            <ArrowOutwardIcon sx={{ fontSize: "18px" }} />
-          </Link>
-        </motion.div>
+            <Box>
+              <Typography
+                sx={{
+                  fontSize: { xs: 38, md: 48 },
+                  fontWeight: 500,
+                  letterSpacing: "-0.03em",
+                  lineHeight: 1,
+                  fontVariantNumeric: "tabular-nums",
+                }}
+              >
+                {data ? total : <Skeleton width={80} height={48} />}
+              </Typography>
+              <Typography sx={{ fontSize: 12, color: "#777", letterSpacing: 1.5, textTransform: "uppercase", mt: 1 }}>
+                Submissions
+              </Typography>
+            </Box>
 
-        <motion.div
-          initial={reducedMotion ? false : { y: 40, opacity: 0 }}
-          whileInView={{ y: 0, opacity: 1 }}
-          viewport={{ once: true, margin: "-50px" }}
-          transition={{
-            duration: reducedMotion ? 0 : 0.8,
-            ease: [0.17, 0.55, 0.55, 1],
-            delay: 0.3,
-          }}
-        >
-          <Box sx={{ border: "1px solid #e0e0e0", borderRadius: "16px", p: { xs: 2, md: 4 }, mt: 4 }}>
-            {!data ? (
-              <Box role="status">
-                <Typography>
-                  {error
-                    ? "Activity is unavailable right now. Visit my LeetCode profile or try again."
-                    : "Loading LeetCode activity…"}
+            <Box>
+              <Typography
+                sx={{
+                  fontSize: { xs: 38, md: 48 },
+                  fontWeight: 500,
+                  letterSpacing: "-0.03em",
+                  lineHeight: 1,
+                  fontVariantNumeric: "tabular-nums",
+                }}
+              >
+                {data ? active : <Skeleton width={80} height={48} />}
+              </Typography>
+              <Typography sx={{ fontSize: 12, color: "#777", letterSpacing: 1.5, textTransform: "uppercase", mt: 1 }}>
+                Active days
+              </Typography>
+            </Box>
+
+            {data && (
+              <Box sx={{ ml: { sm: "auto" }, alignSelf: { sm: "flex-end" } }}>
+                <Typography sx={{ fontSize: 12, color: "#888", fontVariantNumeric: "tabular-nums" }}>
+                  Past 365 days · {formatDate(new Date(data.updatedAt))}
                 </Typography>
-                {error && (
+              </Box>
+            )}
+          </Box>
+        </motion.div>
+
+        {/* Heatmap Grid & Legend (Borderless) */}
+        <motion.div
+          initial={reducedMotion ? false : { y: 40, opacity: 0 }}
+          whileInView={{ y: 0, opacity: 1 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{
+            duration: reducedMotion ? 0 : 0.8,
+            ease: [0.17, 0.55, 0.55, 1],
+            delay: 0.25,
+          }}
+        >
+          <Box sx={{ pt: { xs: 3, md: 4 } }}>
+            {!data ? (
+              error ? (
+                <Box sx={{ py: 4, textAlign: "left" }}>
+                  <Typography sx={{ color: "#666", fontSize: 14, mb: 1.5 }}>
+                    Activity is temporarily unavailable right now.
+                  </Typography>
                   <Button
+                    size="small"
+                    variant="outlined"
                     onClick={() => {
                       setError(false);
-                      setRefreshKey((key) => key + 1);
+                      setRefreshKey((k) => k + 1);
                     }}
+                    sx={{ color: "#111", borderColor: "#ddd", textTransform: "none", fontSize: 13 }}
                   >
-                    Try again
+                    Retry loading
                   </Button>
-                )}
-              </Box>
+                </Box>
+              ) : (
+                <Box sx={{ py: 2 }}>
+                  <Skeleton variant="rectangular" height={130} sx={{ borderRadius: 1, bgcolor: "#f5f5f3" }} />
+                </Box>
+              )
             ) : (
               <>
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    alignItems: "end",
-                    gap: { xs: 3, md: 6 },
-                    mb: 3,
-                    pb: 3,
-                    borderBottom: "1px solid #eee",
-                  }}
-                >
-                  <Box>
-                    <Typography sx={{ fontSize: 32, letterSpacing: "-1px", lineHeight: 1.2 }}>
-                      {total}
-                    </Typography>
-                    <Typography sx={{ fontSize: 12, color: "#666", mt: 0.5 }}>Submissions</Typography>
-                  </Box>
-                  <Box>
-                    <Typography sx={{ fontSize: 32, letterSpacing: "-1px", lineHeight: 1.2 }}>
-                      {active}
-                    </Typography>
-                    <Typography sx={{ fontSize: 12, color: "#666", mt: 0.5 }}>Active days</Typography>
-                  </Box>
-                  <Typography sx={{ fontSize: 12, color: "#666", ml: { md: "auto" } }}>
-                    Past 365 days · {formatDate(new Date(data.updatedAt))}
-                  </Typography>
-                </Box>
                 <Box
                   ref={calendarRef}
                   data-lenis-prevent
@@ -198,10 +266,14 @@ export default function SectionLeetCode() {
                   aria-label="LeetCode submission calendar; scroll horizontally to see all dates"
                   sx={{
                     overflowX: "auto",
-                    pb: 1,
+                    py: 1,
+                    "&::-webkit-scrollbar": { height: 6 },
+                    "&::-webkit-scrollbar-track": { bgcolor: "transparent" },
+                    "&::-webkit-scrollbar-thumb": { bgcolor: "#e0e0e0", borderRadius: 3 },
                     "&:focus-visible": { outline: "2px solid black", outlineOffset: 4 },
                   }}
                 >
+                  {/* Months header */}
                   <Box
                     sx={{
                       display: "grid",
@@ -209,7 +281,7 @@ export default function SectionLeetCode() {
                       gridAutoColumns: "13px",
                       gap: "4px",
                       width: "max-content",
-                      mb: 1,
+                      mb: 1.25,
                       height: 18,
                     }}
                     aria-hidden="true"
@@ -219,7 +291,7 @@ export default function SectionLeetCode() {
                         .slice(week * 7, week * 7 + 7)
                         .find((d) => d && (d.date.getUTCDate() === 1 || week === 0));
                       return (
-                        <Box key={week} sx={{ fontSize: 10, color: "#666", whiteSpace: "nowrap" }}>
+                        <Box key={week} sx={{ fontSize: 10, color: "#888", whiteSpace: "nowrap", fontFamily: "monospace" }}>
                           {day
                             ? day.date.toLocaleDateString("en-GB", { month: "short", timeZone: "UTC" })
                             : ""}
@@ -227,6 +299,8 @@ export default function SectionLeetCode() {
                       );
                     })}
                   </Box>
+
+                  {/* 7 rows grid */}
                   <Box
                     sx={{
                       display: "grid",
@@ -235,13 +309,14 @@ export default function SectionLeetCode() {
                       gridAutoColumns: "13px",
                       gap: "4px",
                       width: "max-content",
+                      py: 0.5,
                     }}
                   >
                     {days.map((day, i) =>
                       day ? (
                         <Tooltip
                           key={i}
-                          title={`${formatDate(day.date)}: ${day.count} submissions`}
+                          title={`${formatDate(day.date)}: ${day.count} ${day.count === 1 ? "submission" : "submissions"}`}
                           arrow
                           describeChild
                         >
@@ -249,7 +324,9 @@ export default function SectionLeetCode() {
                             tabIndex={day.count ? 0 : undefined}
                             aria-label={`${formatDate(day.date)}: ${day.count} submissions`}
                             sx={{
-                              borderRadius: "3px",
+                              width: 13,
+                              height: 13,
+                              borderRadius: "2.5px",
                               bgcolor:
                                 colors[
                                   day.count === 0
@@ -262,6 +339,13 @@ export default function SectionLeetCode() {
                                     ? 3
                                     : 4
                                 ],
+                              cursor: "pointer",
+                              transition: "transform 0.12s ease, box-shadow 0.12s ease",
+                              "&:hover": {
+                                transform: "scale(1.35)",
+                                zIndex: 5,
+                                boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                              },
                               "&:focus-visible": { outline: "2px solid black", outlineOffset: 2 },
                             }}
                           />
@@ -272,29 +356,44 @@ export default function SectionLeetCode() {
                     )}
                   </Box>
                 </Box>
-                <Typography sx={{ display: { xs: "block", md: "none" }, fontSize: 11, color: "#666", mt: 1 }}>
-                  Swipe horizontally to explore the year
+
+                {/* Mobile scroll hint */}
+                <Typography sx={{ display: { xs: "block", md: "none" }, fontSize: 11, color: "#888", mt: 1.5 }}>
+                  Swipe horizontally to explore earlier activity
                 </Typography>
-                <Box sx={{ display: "flex", gap: 1, alignItems: "center", mt: 2, justifyContent: "flex-end" }}>
-                  <Typography variant="caption">Less</Typography>
-                  {colors.map((color) => (
-                    <Box key={color} sx={{ width: 13, height: 13, borderRadius: "3px", bgcolor: color }} />
-                  ))}
-                  <Typography variant="caption">More</Typography>
-                </Box>
-                <Typography sx={{ mt: 2, color: "#666", fontSize: 13 }}>
-                  Submission activity, not unique problems solved. Last synced{" "}
-                  {new Date(data.updatedAt).toLocaleTimeString("en-GB", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}{" "}
-                  · UTC dates.
-                </Typography>
-                {error && (
-                  <Typography role="status" sx={{ mt: 1, color: "#666", fontSize: 13 }}>
-                    Could not refresh. Showing the last successful sync.
+
+                {/* Footer notes & Legend */}
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: { xs: "column-reverse", sm: "row" },
+                    justifyContent: "space-between",
+                    alignItems: { xs: "flex-start", sm: "center" },
+                    gap: 1.5,
+                    mt: 2.5,
+                    pt: 2,
+                  }}
+                >
+                  <Typography sx={{ color: "#888", fontSize: 12 }}>
+                    Submission activity over the past year · Synced from LeetCode
                   </Typography>
-                )}
+
+                  <Box sx={{ display: "flex", gap: 0.75, alignItems: "center" }}>
+                    <Typography sx={{ fontSize: 11, color: "#888", mr: 0.5 }}>Less</Typography>
+                    {colors.map((color) => (
+                      <Box
+                        key={color}
+                        sx={{
+                          width: 11,
+                          height: 11,
+                          borderRadius: "2px",
+                          bgcolor: color,
+                        }}
+                      />
+                    ))}
+                    <Typography sx={{ fontSize: 11, color: "#888", ml: 0.5 }}>More</Typography>
+                  </Box>
+                </Box>
               </>
             )}
           </Box>
