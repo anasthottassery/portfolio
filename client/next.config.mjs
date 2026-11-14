@@ -1,15 +1,21 @@
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',  // Required: Generates static HTML/CSS/JS
+  // Generate static files for GitHub Pages
+  output: "export",
+
   // Disable the Next.js identification header
   poweredByHeader: false,
 
-  // Do not publish production browser source maps
+  // Disable production browser source maps
   productionBrowserSourceMaps: false,
+
+  // GitHub Pages does not support Next.js image optimization
   images: {
-    unoptimized: true, // Required: GitHub Pages cannot optimize images on the server
+    unoptimized: true,
   },
-  // Note: No basePath is needed because this is your root site!
+
+  // Remove unnecessary console output in production
   compiler: {
     removeConsole:
       process.env.NODE_ENV === "production"

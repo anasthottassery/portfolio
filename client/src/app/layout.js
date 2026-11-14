@@ -1,7 +1,6 @@
 import ThemeRegistry from "@/components/themeRegistry";
 import "./globals.css";
 import NavbarLoader from "@/components/NavbarLoader";
-// import DevHumorDialog from "@/components/DevHumorDialog";
 import SmoothScroll from "@/components/SmoothScroll";
 
 
@@ -11,7 +10,7 @@ export const metadata = {
   title: "Mohammed Anas Thottassery | Software Developer",
 
   description:
-    "The portfolio of Mohammed Anas Thottassery — a software developer building web and native applications, exploring software systems, and solving practical engineering problems.",
+    "Explore the portfolio of Mohammed Anas Thottassery, a software developer building web and native applications, exploring software systems, and solving practical engineering problems.",
 
   alternates: {
     canonical: "/",
@@ -39,7 +38,6 @@ export default function RootLayout({ children }) {
       <body>
         <SmoothScroll>
           <ThemeRegistry>
-            {/* <DevHumorDialog /> */}
             <NavbarLoader />
             <main>{children}</main>
           </ThemeRegistry>
